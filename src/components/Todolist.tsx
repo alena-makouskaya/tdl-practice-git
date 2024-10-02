@@ -9,25 +9,35 @@ export type TasksPropsType = {
 };
 
 type TodolistPropsType = {
+  id: string;
   title: string;
+  filter: FilterValueType;
   tasks: TasksPropsType[];
 
-  removeTask: (taskId: string) => void;
-  addTask: (title: string) => void;
-  changeTaskStatus: (taskId: string, isDone: boolean) => void;
+  removeTask: (todolistId: string, taskId: string) => void;
+  addTask: (todolistId: string, title: string) => void;
+  changeTaskStatus: (
+    todolistId: string,
+    taskId: string,
+    isDone: boolean
+  ) => void;
 
-  changeTodolistFilter: (filetr: FilterValueType) => void;
+  changeTodolistFilter: (todolistId: string, filter: FilterValueType) => void;
+  removeTodolist: (todolistId: string) => void;
 };
 
 export const Todolist = (props: TodolistPropsType) => {
   console.log("Todolist is called");
   const {
+    id,
     title,
+    filter,
     tasks,
     removeTask,
     addTask,
     changeTodolistFilter,
     changeTaskStatus,
+    removeTodolist,
   } = props;
 
   let [inputValue, setInputValue] = React.useState("");
@@ -42,16 +52,16 @@ export const Todolist = (props: TodolistPropsType) => {
   };
 
   const removeTaskHandler = (taskId: string) => {
-    removeTask(taskId);
+    removeTask(id, taskId);
   };
 
   const changeTaskStatusHandler = (taskId: string, isDone: boolean) => {
-    changeTaskStatus(taskId, isDone);
+    changeTaskStatus(id, taskId, isDone);
   };
 
   const addTaskHandler = () => {
     if (inputValue.trim() !== "") {
-      addTask(inputValue.trim());
+      addTask(id, inputValue.trim());
       setInputValue("");
     } else {
       setError("Title is required");
@@ -59,15 +69,15 @@ export const Todolist = (props: TodolistPropsType) => {
   };
 
   const changeTodolistFilterAll = () => {
-    changeTodolistFilter("all");
+    changeTodolistFilter(id, "all");
   };
 
   const changeTodolistFilterActive = () => {
-    changeTodolistFilter("active");
+    changeTodolistFilter(id, "active");
   };
 
   const changeTodolistFilterCompleted = () => {
-    changeTodolistFilter("completed");
+    changeTodolistFilter(id, "completed");
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -76,9 +86,15 @@ export const Todolist = (props: TodolistPropsType) => {
     }
   };
 
+  const removeTodolistHandler = () => {
+    removeTodolist(id);
+  };
+
   return (
-    <div className="tdlCard">
-      <h3>{title}</h3>
+    <div className="tdlCard" key={id}>
+      <h3>
+        {title} - <button onClick={removeTodolistHandler}> x </button>
+      </h3>
 
       <div>
         <input
@@ -111,9 +127,24 @@ export const Todolist = (props: TodolistPropsType) => {
       </ul>
 
       <div>
-        <button onClick={changeTodolistFilterAll}>All</button>
-        <button onClick={changeTodolistFilterActive}>Active</button>
-        <button onClick={changeTodolistFilterCompleted}>Completed</button>
+        <button
+          className={filter === "all" ? "isActive" : ""}
+          onClick={changeTodolistFilterAll}
+        >
+          All
+        </button>
+        <button
+          className={filter === "active" ? "isActive" : ""}
+          onClick={changeTodolistFilterActive}
+        >
+          Active
+        </button>
+        <button
+          className={filter === "completed" ? "isActive" : ""}
+          onClick={changeTodolistFilterCompleted}
+        >
+          Completed
+        </button>
       </div>
     </div>
   );
