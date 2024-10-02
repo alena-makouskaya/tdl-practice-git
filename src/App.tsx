@@ -4,6 +4,7 @@ import "./App.css";
 import { TasksPropsType, Todolist } from "./components/Todolist";
 import { v1 } from "uuid";
 import { title } from "process";
+import { AddItemForm } from "./components/AddItemForm";
 
 export type FilterValueType = "all" | "active" | "completed";
 
@@ -115,6 +116,18 @@ function App() {
     setTasks({ ...tasks });
   };
 
+  const editTaskTitle = (todolistId: string, taskId: string, title: string) => {
+    let tasksInTodolist = tasks[todolistId];
+
+    let task = tasksInTodolist.find((t) => t.id === taskId);
+
+    if (task) {
+      task.title = title;
+    }
+
+    setTasks({ ...tasks });
+  };
+
   const changeTodolistFilter = (
     todolistId: string,
     filter: FilterValueType
@@ -135,8 +148,35 @@ function App() {
     setTasks({ ...tasks });
   };
 
+  const addTodolist = (title: string) => {
+    let newTodolist: TodolistProps = {
+      id: v1(),
+      title: title,
+      filter: "all",
+    };
+
+    setTodolists([newTodolist, ...todolists]);
+
+    setTasks({
+      [newTodolist.id]: [],
+      ...tasks,
+    });
+  };
+
+  const editTodolistTitle = (todolistId: string, title: string) => {
+    let todolist = todolists.find((tl) => tl.id === todolistId);
+
+    if (todolist) {
+      todolist.title = title;
+    }
+
+    setTodolists([...todolists]);
+  };
+
   return (
     <div className="App">
+      <AddItemForm callBack={(title: string) => addTodolist(title)} />
+
       {todolists.map((tl) => {
         let filteredTasks = tasks[tl.id];
 
@@ -156,9 +196,12 @@ function App() {
             tasks={filteredTasks}
             removeTask={removeTask}
             addTask={addTask}
-            changeTodolistFilter={changeTodolistFilter}
+            editTaskTitle={editTaskTitle}
             changeTaskStatus={changeTaskStatus}
+            
+            changeTodolistFilter={changeTodolistFilter}
             removeTodolist={removeTodolist}
+            editTodolistTitle={editTodolistTitle}
           />
         );
       })}

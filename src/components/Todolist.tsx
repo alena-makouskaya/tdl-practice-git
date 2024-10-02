@@ -2,6 +2,8 @@
 import * as React from "react";
 import { KeyboardEvent } from "react";
 import { FilterValueType } from "../App";
+import { AddItemForm } from "./AddItemForm";
+import { EditableSpan } from "./EditableSpan";
 export type TasksPropsType = {
   id: string;
   title: string;
@@ -21,9 +23,11 @@ type TodolistPropsType = {
     taskId: string,
     isDone: boolean
   ) => void;
+  editTaskTitle: (todolistId: string, taskId: string, title: string) => void;
 
   changeTodolistFilter: (todolistId: string, filter: FilterValueType) => void;
   removeTodolist: (todolistId: string) => void;
+  editTodolistTitle: (todolistId: string, title: string) => void
 };
 
 export const Todolist = (props: TodolistPropsType) => {
@@ -38,34 +42,24 @@ export const Todolist = (props: TodolistPropsType) => {
     changeTodolistFilter,
     changeTaskStatus,
     removeTodolist,
+    editTaskTitle,
+    editTodolistTitle
   } = props;
-
-  let [inputValue, setInputValue] = React.useState("");
-  let [error, setError] = React.useState<null | string>(null);
-
-  const changeInputValueHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.currentTarget.value);
-
-    if (error) {
-      setError(null);
-    }
-  };
 
   const removeTaskHandler = (taskId: string) => {
     removeTask(id, taskId);
+  };
+
+  const addTaskHandler = (title: string) => {
+    addTask(id, title);
   };
 
   const changeTaskStatusHandler = (taskId: string, isDone: boolean) => {
     changeTaskStatus(id, taskId, isDone);
   };
 
-  const addTaskHandler = () => {
-    if (inputValue.trim() !== "") {
-      addTask(id, inputValue.trim());
-      setInputValue("");
-    } else {
-      setError("Title is required");
-    }
+  const editTaskTitleHandler = (taskId: string, title: string) => {
+    editTaskTitle(id, taskId, title);
   };
 
   const changeTodolistFilterAll = () => {
@@ -80,33 +74,22 @@ export const Todolist = (props: TodolistPropsType) => {
     changeTodolistFilter(id, "completed");
   };
 
-  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      addTaskHandler();
-    }
-  };
-
   const removeTodolistHandler = () => {
     removeTodolist(id);
   };
 
+  const editTodolistTitleHandler = (title: string) => {
+    editTodolistTitle(id, title)
+  }
+
   return (
     <div className="tdlCard" key={id}>
       <h3>
-        {title} - <button onClick={removeTodolistHandler}> x </button>
+        <EditableSpan title={title} callBack={editTodolistTitleHandler} />
+         - <button onClick={removeTodolistHandler}> x </button>
       </h3>
 
-      <div>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={changeInputValueHandler}
-          onKeyDown={onKeyDown}
-          className={error ? "error" : ""}
-        />
-        <button onClick={addTaskHandler}> + </button>
-        {error && <div className="errorText">{error}</div>}
-      </div>
+      <AddItemForm callBack={addTaskHandler} />
 
       <ul>
         {tasks.map((t) => {
@@ -119,7 +102,11 @@ export const Todolist = (props: TodolistPropsType) => {
                   changeTaskStatusHandler(t.id, e.currentTarget.checked)
                 }
               />
-              <span>{t.title}</span>
+              {/* <span>{t.title}</span> */}
+              <EditableSpan
+                title={t.title}
+                callBack={(title: string) => editTaskTitleHandler(t.id, title)}
+              />
               <button onClick={() => removeTaskHandler(t.id)}> x </button>
             </li>
           );
