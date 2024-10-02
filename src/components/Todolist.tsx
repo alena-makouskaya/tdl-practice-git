@@ -14,13 +14,21 @@ type TodolistPropsType = {
 
   removeTask: (taskId: string) => void;
   addTask: (title: string) => void;
+  changeTaskStatus: (taskId: string, isDone: boolean) => void;
 
-  changeTodolistFilter: (filetr: FilterValueType) => void
+  changeTodolistFilter: (filetr: FilterValueType) => void;
 };
 
 export const Todolist = (props: TodolistPropsType) => {
   console.log("Todolist is called");
-  const { title, tasks, removeTask, addTask, changeTodolistFilter } = props;
+  const {
+    title,
+    tasks,
+    removeTask,
+    addTask,
+    changeTodolistFilter,
+    changeTaskStatus,
+  } = props;
 
   let [inputValue, setInputValue] = React.useState("");
   let [error, setError] = React.useState<null | string>(null);
@@ -28,13 +36,17 @@ export const Todolist = (props: TodolistPropsType) => {
   const changeInputValueHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.currentTarget.value);
 
-    if(error){
-        setError(null)
+    if (error) {
+      setError(null);
     }
   };
 
   const removeTaskHandler = (taskId: string) => {
     removeTask(taskId);
+  };
+
+  const changeTaskStatusHandler = (taskId: string, isDone: boolean) => {
+    changeTaskStatus(taskId, isDone);
   };
 
   const addTaskHandler = () => {
@@ -47,16 +59,16 @@ export const Todolist = (props: TodolistPropsType) => {
   };
 
   const changeTodolistFilterAll = () => {
-    changeTodolistFilter("all")
-  }
+    changeTodolistFilter("all");
+  };
 
   const changeTodolistFilterActive = () => {
-    changeTodolistFilter("active")
-  }
+    changeTodolistFilter("active");
+  };
 
   const changeTodolistFilterCompleted = () => {
-    changeTodolistFilter("completed")
-  }
+    changeTodolistFilter("completed");
+  };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -84,7 +96,13 @@ export const Todolist = (props: TodolistPropsType) => {
         {tasks.map((t) => {
           return (
             <li key={t.id}>
-              <input type="checkbox" checked={t.isDone} onChange={() => {}} />
+              <input
+                type="checkbox"
+                checked={t.isDone}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  changeTaskStatusHandler(t.id, e.currentTarget.checked)
+                }
+              />
               <span>{t.title}</span>
               <button onClick={() => removeTaskHandler(t.id)}> x </button>
             </li>
