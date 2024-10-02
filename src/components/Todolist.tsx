@@ -9,10 +9,17 @@ export type TasksPropsType = {
 type TodolistPropsType = {
   title: string;
   tasks: TasksPropsType[];
+
+  removeTask: (taskId: string) => void;
 };
 
 export const Todolist = (props: TodolistPropsType) => {
-  const { title, tasks } = props;
+  console.log("Todolist is called");
+  const { title, tasks, removeTask } = props;
+
+  const removeTaskHandler = (taskId: string) => {
+    removeTask(taskId);
+  };
 
   return (
     <div className="tdlCard">
@@ -26,10 +33,10 @@ export const Todolist = (props: TodolistPropsType) => {
       <ul>
         {tasks.map((t) => {
           return (
-            <li>
-              <input type="checkbox" checked={t.isDone} />
+            <li key={t.id}>
+              <input type="checkbox" checked={t.isDone} onChange={() => {}}/>
               <span>{t.title}</span>
-              <button> x </button>
+              <button onClick={() => removeTaskHandler(t.id)}> x </button>
             </li>
           );
         })}
