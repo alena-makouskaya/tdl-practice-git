@@ -14,3 +14,11 @@
 
 }
 
+.errorText{
+  color: red;
+}
+
+.error{
+  border: 1px solid red;
+}
+
