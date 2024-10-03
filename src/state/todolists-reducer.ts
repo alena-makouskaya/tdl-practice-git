@@ -1,5 +1,5 @@
 import { title } from "process";
-import { FilterValueType, TodolistProps } from "../App";
+import { FilterValueType, TodolistProps } from "../AppWithRedux";
 import { v1 } from "uuid";
 
 export type ChangeTodolistFilterActionType = {
@@ -31,8 +31,24 @@ export type ActionType =
   | EditTodolistTitleActionType
   | ChangeTodolistFilterActionType;
 
+  export let todolistId1 = v1();
+  export let todolistId2 = v1();
+
+  const initialState: TodolistProps[] = [
+    // {
+    //   id: todolistId1,
+    //   title: "What to learn?",
+    //   filter: "all",
+    // },
+    // {
+    //   id: todolistId2,
+    //   title: "What to ggggg?",
+    //   filter: "all",
+    // },
+  ]
+
 export const todolistsReducer = (
-  state: TodolistProps[],
+  state: TodolistProps[] = initialState,
   action: ActionType
 ): TodolistProps[] => {
   switch (action.type) {
@@ -71,7 +87,7 @@ export const todolistsReducer = (
     }
 
     default:
-      throw new Error("I dont udnerstand this actopn type");
+      return state;
   }
 };
 

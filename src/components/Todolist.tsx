@@ -1,9 +1,12 @@
 // @flow
 import * as React from "react";
 import { KeyboardEvent } from "react";
-import { FilterValueType } from "../App";
+import { FilterValueType, TasksStateType } from "../AppWithRedux";
 import { AddItemForm } from "./AddItemForm";
 import { EditableSpan } from "./EditableSpan";
+import { useDispatch, useSelector } from "react-redux";
+import { AppRootState } from "../state/store";
+import { AddTaskAC, ChangeTaskStatusAC, EditTaskTitleAC, RemoveTaskAC } from "../state/tasks-reducer";
 export type TasksPropsType = {
   id: string;
   title: string;
@@ -14,16 +17,6 @@ type TodolistPropsType = {
   id: string;
   title: string;
   filter: FilterValueType;
-  tasks: TasksPropsType[];
-
-  removeTask: (todolistId: string, taskId: string) => void;
-  addTask: (todolistId: string, title: string) => void;
-  changeTaskStatus: (
-    todolistId: string,
-    taskId: string,
-    isDone: boolean
-  ) => void;
-  editTaskTitle: (todolistId: string, taskId: string, title: string) => void;
 
   changeTodolistFilter: (todolistId: string, filter: FilterValueType) => void;
   removeTodolist: (todolistId: string) => void;
@@ -36,15 +29,39 @@ export const Todolist = (props: TodolistPropsType) => {
     id,
     title,
     filter,
-    tasks,
-    removeTask,
-    addTask,
+
     changeTodolistFilter,
-    changeTaskStatus,
     removeTodolist,
-    editTaskTitle,
     editTodolistTitle
   } = props;
+
+  const dispatch = useDispatch();
+  const tasks = useSelector<AppRootState, TasksPropsType[]>((state) => state.tasks[id] )
+
+  const removeTask = (todolistId: string, taskId: string) => {
+    let action = RemoveTaskAC(todolistId, taskId);
+    dispatch(action);
+  };
+
+  const addTask = (todolistId: string, title: string) => {
+    let action = AddTaskAC(todolistId, title);
+    dispatch(action);
+  };
+
+  const changeTaskStatus = (
+    todolistId: string,
+    taskId: string,
+    isDone: boolean
+  ) => {
+    let action = ChangeTaskStatusAC(todolistId, taskId, isDone);
+    dispatch(action);
+  };
+
+  const editTaskTitle = (todolistId: string, taskId: string, title: string) => {
+    let action = EditTaskTitleAC(todolistId, taskId, title);
+    dispatch(action);
+  };
+
 
   const removeTaskHandler = (taskId: string) => {
     removeTask(id, taskId);
@@ -82,6 +99,16 @@ export const Todolist = (props: TodolistPropsType) => {
     editTodolistTitle(id, title)
   }
 
+  let filteredTasks = tasks;
+
+  if (filter === "active") {
+    filteredTasks = filteredTasks.filter((t) => t.isDone === false);
+  }
+
+  if (filter === "completed") {
+    filteredTasks = filteredTasks.filter((t) => t.isDone === true);
+  }
+
   return (
     <div className="tdlCard" key={id}>
       <h3>
@@ -92,7 +119,7 @@ export const Todolist = (props: TodolistPropsType) => {
       <AddItemForm callBack={addTaskHandler} />
 
       <ul>
-        {tasks.map((t) => {
+        {filteredTasks.map((t) => {
           return (
             <li key={t.id}>
               <input
