@@ -28,7 +28,8 @@ export type RemoveTodolistActionType = {
 export type ActionType =
   | RemoveTodolistActionType
   | AddTodolistActionType
-  | EditTodolistTitleActionType | ChangeTodolistFilterActionType;
+  | EditTodolistTitleActionType
+  | ChangeTodolistFilterActionType;
 
 export const todolistsReducer = (
   state: TodolistProps[],
@@ -40,14 +41,13 @@ export const todolistsReducer = (
     }
 
     case "ADD-TODOLIST": {
-      return [
-        {
-          id: action.todolistId,
-          title: action.title,
-          filter: "all",
-        },
-        ...state,
-      ];
+      let newDolist: TodolistProps = {
+        id: action.todolistId,
+        title: action.title,
+        filter: "all",
+      };
+
+      return [newDolist, ...state];
     }
 
     case "EDIT-TODOLIST-TITLE": {
@@ -57,18 +57,17 @@ export const todolistsReducer = (
         todolist.title = action.title;
       }
 
-      return  [...state ];
+      return [...state];
     }
 
-
     case "CHANGE-TODOLIST-FILTER": {
-        let todolist = state.find((tl) => tl.id === action.todolistId);
+      let todolist = state.find((tl) => tl.id === action.todolistId);
 
-        if (todolist) {
-          todolist.filter = action.filter;
-        }
-  
-        return  [...state ];
+      if (todolist) {
+        todolist.filter = action.filter;
+      }
+
+      return [...state];
     }
 
     default:
