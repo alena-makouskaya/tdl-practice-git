@@ -1,6 +1,6 @@
 // @flow
 import * as React from "react";
-import { KeyboardEvent } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback } from "react";
 import { FilterValueType } from "../App";
 import { AddItemForm } from "./AddItemForm";
 import { EditableSpan } from "./EditableSpan";
@@ -27,11 +27,10 @@ type TodolistPropsType = {
 
   changeTodolistFilter: (todolistId: string, filter: FilterValueType) => void;
   removeTodolist: (todolistId: string) => void;
-  editTodolistTitle: (todolistId: string, title: string) => void
+  editTodolistTitle: (todolistId: string, title: string) => void;
 };
 
-export const Todolist = (props: TodolistPropsType) => {
-  console.log("Todolist is called");
+export const Todolist = React.memo((props: TodolistPropsType) => {
   const {
     id,
     title,
@@ -43,72 +42,106 @@ export const Todolist = (props: TodolistPropsType) => {
     changeTaskStatus,
     removeTodolist,
     editTaskTitle,
-    editTodolistTitle
+    editTodolistTitle,
   } = props;
+
+  console.log(`Todolist is called ${id}`);
 
   const removeTaskHandler = (taskId: string) => {
     removeTask(id, taskId);
   };
 
-  const addTaskHandler = (title: string) => {
-    addTask(id, title);
-  };
+  const addTaskHandler = useCallback(
+    (title: string) => {
+      addTask(id, title);
+    },
+    [addTask, id]
+  );
 
-  const changeTaskStatusHandler = (taskId: string, isDone: boolean) => {
+  const changeTaskStatusHandler = useCallback( (taskId: string, isDone: boolean) => {
     changeTaskStatus(id, taskId, isDone);
-  };
+  }, [changeTaskStatus, id]);
 
-  const editTaskTitleHandler = (taskId: string, title: string) => {
-    editTaskTitle(id, taskId, title);
-  };
+  const editTaskTitleHandler = useCallback(
+    (taskId: string, title: string) => {
+      editTaskTitle(id, taskId, title);
+    },
+    [editTaskTitle, id]
+  );
 
-  const changeTodolistFilterAll = () => {
+  const changeTodolistFilterAll = useCallback(() => {
     changeTodolistFilter(id, "all");
-  };
+  }, [changeTodolistFilter, id]);
 
-  const changeTodolistFilterActive = () => {
+  const changeTodolistFilterActive = useCallback(() => {
     changeTodolistFilter(id, "active");
-  };
+  }, [changeTodolistFilter, id]);
 
-  const changeTodolistFilterCompleted = () => {
+  const changeTodolistFilterCompleted = useCallback(() => {
     changeTodolistFilter(id, "completed");
-  };
+  }, [changeTodolistFilter, id]);
 
   const removeTodolistHandler = () => {
     removeTodolist(id);
   };
 
-  const editTodolistTitleHandler = (title: string) => {
-    editTodolistTitle(id, title)
+  const editTodolistTitleHandler = useCallback(
+    (title: string) => {
+      // console.log(`editTodolistTitleHandler ${id}`)
+      editTodolistTitle(id, title);
+    },
+    [editTodolistTitle, id]
+  );
+
+  let filteredTasks = tasks;
+
+  if (filter === "active") {
+    filteredTasks = tasks.filter((t) => t.isDone === false);
+  }
+
+  if (filter === "completed") {
+    filteredTasks = tasks.filter((t) => t.isDone === true);
   }
 
   return (
     <div className="tdlCard" key={id}>
       <h3>
-        <EditableSpan title={title} callBack={editTodolistTitleHandler} />
-         - <button onClick={removeTodolistHandler}> x </button>
+        <EditableSpan title={title} callBack={editTodolistTitleHandler} />-{" "}
+        <button onClick={removeTodolistHandler}> x </button>
       </h3>
 
       <AddItemForm callBack={addTaskHandler} />
 
       <ul>
-        {tasks.map((t) => {
+        {filteredTasks.map((t, index) => {
+
+
           return (
-            <li key={t.id}>
-              <input
-                type="checkbox"
-                checked={t.isDone}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  changeTaskStatusHandler(t.id, e.currentTarget.checked)
-                }
-              />
-              {/* <span>{t.title}</span> */}
-              <EditableSpan
-                title={t.title}
-                callBack={(title: string) => editTaskTitleHandler(t.id, title)}
-              />
-              <button onClick={() => removeTaskHandler(t.id)}> x </button>
-            </li>
+            <Task
+            key={index}
+            id={t.id}
+            title={t.title}
+            isDone={t.isDone}
+            changeTaskStatus={changeTaskStatusHandler}
+            editTaskTitle={editTaskTitleHandler}
+            removeTask={removeTaskHandler}
+          />
+
+            // <li key={index}>
+            //   <input
+            //     type="checkbox"
+            //     checked={t.isDone}
+            //     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            //       changeTaskStatusHandler(t.id, e.currentTarget.checked)
+            //     }
+            //   />
+            //   {/* <span>{t.title}</span> */}
+            //   <EditableSpan
+            //     title={t.title}
+            //     callBack={(title: string) => editTaskTitleHandler(t.id, title)}
+            //   />
+            //   <button onClick={() => removeTaskHandler(t.id)}> x </button>
+            // </li>
           );
         })}
       </ul>
@@ -135,4 +168,44 @@ export const Todolist = (props: TodolistPropsType) => {
       </div>
     </div>
   );
+});
+
+type TaskPropsType = {
+  id: string;
+  title: string;
+  isDone: boolean;
+
+  editTaskTitle: (taskId: string, title: string) => void;
+  changeTaskStatus: (taskId: string, isDone: boolean) => void;
+  removeTask: (taskId: string) => void;
 };
+
+const Task = React.memo((props: TaskPropsType) => {
+  const { id, title, editTaskTitle, isDone, changeTaskStatus, removeTask } =
+    props;
+
+  const changeTaskStatusHandler = useCallback ((e: ChangeEvent<HTMLInputElement>) => {
+    changeTaskStatus(id, e.currentTarget.checked);
+  }, [changeTaskStatus, id]);
+
+  const editTaskTitleHandler = useCallback ((title: string) => {
+    editTaskTitle(id, title);
+  }, [editTaskTitle, id]);
+
+  const removeTaskHandler = useCallback (() => {
+    removeTask(id);
+  }, [id]);
+
+  return (
+    <li>
+      <input
+        type="checkbox"
+        checked={isDone}
+        onChange={changeTaskStatusHandler}
+      />
+
+      <EditableSpan title={title} callBack={editTaskTitleHandler} />
+      <button onClick={removeTaskHandler}> x </button>
+    </li>
+  );
+});
