@@ -1,4 +1,10 @@
-import { addTodolistAC, AddTodolistActionType, RemoveTodolistActionType } from "./todolists-reducer";
+import {
+  addTodolistAC,
+  AddTodolistActionType,
+  RemoveTodolistActionType,
+  todolistId1,
+  todolistId2,
+} from "./todolists-reducer";
 import { v1 } from "uuid";
 import { TasksStateType } from "../App";
 import { title } from "process";
@@ -35,10 +41,14 @@ type ActionType =
   | EditTaskTitleActionType
   | ChangeTaskStatusActionType
   | AddTodolistActionType
-  | RemoveTodolistActionType
-  ;
+  | RemoveTodolistActionType;
 
-export const tasksReducer = (state: TasksStateType, action: ActionType) => {
+const initialState: TasksStateType = {};
+
+export const tasksReducer = (
+  state: TasksStateType = initialState,
+  action: ActionType
+) => {
   switch (action.type) {
     case "REMOVE-TASK": {
       let tasksInTodolist = state[action.todolistId];
@@ -106,7 +116,7 @@ export const tasksReducer = (state: TasksStateType, action: ActionType) => {
     }
 
     default:
-      throw new Error("I dont udnerstand this actopn type");
+      return state;
   }
 };
 

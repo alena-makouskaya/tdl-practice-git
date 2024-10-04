@@ -31,8 +31,13 @@ export type ActionType =
   | EditTodolistTitleActionType
   | ChangeTodolistFilterActionType;
 
+export let todolistId1 = v1();
+export let todolistId2 = v1();
+
+const initialState: TodolistProps[] = [];
+
 export const todolistsReducer = (
-  state: TodolistProps[],
+  state: TodolistProps[] = initialState,
   action: ActionType
 ): TodolistProps[] => {
   switch (action.type) {
@@ -71,7 +76,7 @@ export const todolistsReducer = (
     }
 
     default:
-      throw new Error("I dont udnerstand this actopn type");
+      return state;
   }
 };
 
