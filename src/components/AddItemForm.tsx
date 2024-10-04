@@ -1,12 +1,14 @@
 // @flow
 import * as React from "react";
-import { KeyboardEvent } from "react";
+import { KeyboardEvent, memo } from "react";
 
 type AddItemFormPropsType = {
   callBack: (value: string) => void;
 };
 
-export const AddItemForm = (props: AddItemFormPropsType) => {
+export const AddItemForm = React.memo ((props: AddItemFormPropsType) => {
+  console.log("AddItemForm is called");
+
   let { callBack } = props;
 
   let [inputValue, setInputValue] = React.useState("");
@@ -15,7 +17,7 @@ export const AddItemForm = (props: AddItemFormPropsType) => {
   const changeInputValueHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.currentTarget.value);
 
-    if (error) {
+    if (error !== null) {
       setError(null);
     }
   };
@@ -48,4 +50,4 @@ export const AddItemForm = (props: AddItemFormPropsType) => {
       {error && <div className="errorText">{error}</div>}
     </div>
   );
-};
+});
