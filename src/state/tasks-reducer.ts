@@ -79,24 +79,18 @@ export const tasksReducer = (
 
     case "EDIT-TASK-TITLE": {
       let tasksInTodolist = state[action.todolistId];
-
-      let task = tasksInTodolist.find((t) => t.id === action.taskId);
-
-      if (task) {
-        task.title = action.title;
-      }
+      state[action.todolistId] = tasksInTodolist.map((t) =>
+        t.id === action.taskId ? { ...t, title: action.title } : t
+      );
 
       return { ...state };
     }
 
     case "CHANGE-TASK-STATUS": {
       let tasksInTodolist = state[action.todolistId];
-
-      let task = tasksInTodolist.find((t) => t.id === action.taskId);
-
-      if (task) {
-        task.isDone = action.isDone;
-      }
+      state[action.todolistId] = tasksInTodolist.map((t) =>
+        t.id === action.taskId ? { ...t, isDone: action.isDone } : t
+      );
 
       return { ...state };
     }
