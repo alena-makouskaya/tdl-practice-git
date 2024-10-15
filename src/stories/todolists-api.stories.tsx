@@ -46,7 +46,7 @@ export const DeleteTodolist = () => {
   const [state, setState] = useState<any>(null);
 
   useEffect(() => {
-    let todolistId = "73916fd-76df-4c97-9ea5-f981de8f8d5a";
+    let todolistId = "acaa62c5-4e3f-4ca1-8d6d-e491c8cbfa95";
 
     todolistAPI.deleteTodolist(todolistId).then((res) => {
       setState(res.data);
@@ -60,7 +60,7 @@ export const UpdateTodolist = () => {
   const [state, setState] = useState<any>(null);
 
   useEffect(() => {
-    let todolistId = "573916fd-76df-4c97-9ea5-f981de8f8d5a";
+    let todolistId = "13a7bc13-a5aa-4c2d-8a56-7907d62ba364";
     let title = "New Title - The Design Clarity of Wilhelm Wagenfeld";
     todolistAPI.updateTodolist(todolistId, title).then((res) => {
       setState(res.data);
