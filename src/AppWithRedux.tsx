@@ -45,69 +45,59 @@ const tasks = useSelector<AppRootState, TasksStateType>(state => state.tasks)
 
   let [filter, setFilter] = useState<FilterValueType>("all");
 
-  const removeTask = (todolistId: string, taskId: string) => {
+  const removeTask = useCallback((todolistId: string, taskId: string) => {
     let action = RemoveTaskAC(todolistId, taskId);
     dispatch(action);
-  };
+  }, [dispatch]);
 
-  const addTask = (todolistId: string, title: string) => {
+  const addTask = useCallback ((todolistId: string, title: string) => {
     let action = AddTaskAC(todolistId, title);
     dispatch(action);
-  };
+  }, [dispatch]);
 
-  const changeTaskStatus = (
+  const changeTaskStatus = useCallback ((
     todolistId: string,
     taskId: string,
     isDone: boolean
   ) => {
     let action = ChangeTaskStatusAC(todolistId, taskId, isDone);
     dispatch(action);
-  };
+  }, [dispatch]);
 
-  const editTaskTitle = (todolistId: string, taskId: string, title: string) => {
+  const editTaskTitle = useCallback ((todolistId: string, taskId: string, title: string) => {
     let action = EditTaskTitleAC(todolistId, taskId, title);
     dispatch(action);
-  };
+  }, [dispatch]);
 
-  const changeTodolistFilter = (
+  const changeTodolistFilter = useCallback ((
     todolistId: string,
     filter: FilterValueType
   ) => {
     let action = changeTodolistFilterAC(todolistId, filter);
     dispatch(action);
-  };
+  }, [dispatch]);
 
-  const removeTodolist = (todolistId: string) => {
+  const removeTodolist = useCallback ((todolistId: string) => {
     let action = removeTodolistAC(todolistId)
     dispatch(action)
-    // dispatch(action)
-  };
+  }, [dispatch]);
 
-  const addTodolist = (title: string) => {
+  const addTodolist = useCallback ((title: string) => {
     let action = addTodolistAC(title);
     dispatch(action);
-    // dispatch(action)
-  };
+  }, [dispatch]);
 
-  const editTodolistTitle = (todolistId: string, title: string) => {
+  const editTodolistTitle = useCallback ((todolistId: string, title: string) => {
     let action = editTodolistTitleAC(todolistId, title);
     dispatch(action);
-  };
+  }, [dispatch]);
 
   return (
     <div className="App">
-      <AddItemForm callBack={(title: string) => addTodolist(title)} />
+      <AddItemForm callBack={addTodolist} />
 
       {todolists.map((tl) => {
         let filteredTasks = tasks[tl.id];
-
-        if (tl.filter === "active") {
-          filteredTasks = filteredTasks.filter((t) => t.isDone === false);
-        }
-
-        if (tl.filter === "completed") {
-          filteredTasks = filteredTasks.filter((t) => t.isDone === true);
-        }
 
         return (
           <Todolist

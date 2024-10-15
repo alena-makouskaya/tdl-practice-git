@@ -1,4 +1,8 @@
-import { addTodolistAC, AddTodolistActionType, RemoveTodolistActionType, todolistId1, todolistId2 } from "./todolists-reducer";
+import {
+  addTodolistAC,
+  AddTodolistActionType,
+  RemoveTodolistActionType,
+} from "./todolists-reducer";
 import { v1 } from "uuid";
 import { TasksStateType } from "../AppWithRedux";
 import { title } from "process";
@@ -35,47 +39,14 @@ type ActionType =
   | EditTaskTitleActionType
   | ChangeTaskStatusActionType
   | AddTodolistActionType
-  | RemoveTodolistActionType
-  ;
+  | RemoveTodolistActionType;
 
-  let initialState: TasksStateType = {
-    [todolistId1]: [
-      {
-        id: v1(),
-        title: "HTML",
-        isDone: true,
-      },
-      {
-        id: v1(),
-        title: "CSS",
-        isDone: true,
-      },
-      {
-        id: v1(),
-        title: "JS",
-        isDone: false,
-      },
-    ],
-    [todolistId2]: [
-      {
-        id: v1(),
-        title: "Milk",
-        isDone: true,
-      },
-      {
-        id: v1(),
-        title: "Bread",
-        isDone: true,
-      },
-      {
-        id: v1(),
-        title: "Juce",
-        isDone: false,
-      },
-    ],
-  }
+let initialState: TasksStateType = {};
 
-export const tasksReducer = (state: TasksStateType = initialState, action: ActionType): TasksStateType => {
+export const tasksReducer = (
+  state: TasksStateType = initialState,
+  action: ActionType
+): TasksStateType => {
   switch (action.type) {
     case "REMOVE-TASK": {
       let tasksInTodolist = state[action.todolistId];
@@ -105,27 +76,22 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
     }
 
     case "EDIT-TASK-TITLE": {
-      let tasksInTodolist = state[action.todolistId];
 
-      let task = tasksInTodolist.find((t) => t.id === action.taskId);
-
-      if (task) {
-        task.title = action.title;
-      }
-
-      return { ...state };
+      return {
+        ...state,
+        [action.todolistId]: state[action.todolistId].map((task) =>
+          task.id === action.taskId ? { ...task, title: action.title } : task
+        ),
+      };
     }
 
     case "CHANGE-TASK-STATUS": {
-      let tasksInTodolist = state[action.todolistId];
-
-      let task = tasksInTodolist.find((t) => t.id === action.taskId);
-
-      if (task) {
-        task.isDone = action.isDone;
-      }
-
-      return { ...state };
+      return {
+        ...state,
+        [action.todolistId]: state[action.todolistId].map((task) =>
+          task.id === action.taskId ? { ...task, isDone: action.isDone } : task
+        ),
+      };
     }
 
     case "ADD-TODOLIST": {
@@ -136,19 +102,16 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
       return stateCopy;
     }
 
-    case "REMOVE-TODOLIST":{
-      const stateCopy = {...state}
-      delete stateCopy[action.todolistId]
-      return stateCopy
-
+    case "REMOVE-TODOLIST": {
+      const stateCopy = { ...state };
+      delete stateCopy[action.todolistId];
+      return stateCopy;
     }
 
     default:
-      return state
+      return state;
   }
 };
-
-
 
 export const RemoveTaskAC = (
   todolistId: string,
